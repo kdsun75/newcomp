@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@tiptap/extension-image": "^2.14.0",
+    "@tiptap/extension-link": "^2.14.0",
+    "@tiptap/extension-youtube": "^2.14.0",
+    "@tiptap/react": "^2.14.0",
+    "@tiptap/starter-kit": "^2.14.0",
+    "@toast-ui/react-editor": "^3.2.3"
+  }
+}
