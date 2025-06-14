@@ -1,7 +1,7 @@
 import React from 'react';
 import PostCard from './PostCard';
 
-interface Post {
+export interface Post {
   id: string;
   title: string;
   content: string;

@@ -1,17 +1,19 @@
 import React from 'react';
-import { Home, PenTool, MessageCircle, User, Bookmark, TrendingUp, Hash } from 'lucide-react';
+import { Home, PenTool, MessageCircle, User, Bookmark, TrendingUp, Hash, Plus } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose?: () => void;
+  onWriteClick?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onWriteClick }) => {
+  const { currentUser } = useAuth();
   const menuItems = [
     { icon: Home, label: '홈', href: '#', active: true },
     { icon: TrendingUp, label: '인기', href: '#', active: false },
-    { icon: PenTool, label: '게시글 작성', href: '#', active: false },
     { icon: MessageCircle, label: '채팅', href: '#', active: false },
     { icon: Bookmark, label: '북마크', href: '#', active: false },
     { icon: User, label: '프로필', href: '#', active: false },

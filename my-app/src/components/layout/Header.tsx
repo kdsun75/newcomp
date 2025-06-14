@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, User, Menu, X, LogOut, ChevronDown } from 'lucide-react';
+import { Search, Bell, User, Menu, X, LogOut, ChevronDown, Plus } from 'lucide-react';
 import Button from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   onMenuToggle?: () => void;
+  onWriteClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
+const Header: React.FC<HeaderProps> = ({ onMenuToggle, onWriteClick }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { currentUser, signOut } = useAuth();
@@ -68,9 +70,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               <a href="#" className="text-gray-500 hover:text-primary-600 px-3 py-2 text-sm font-medium">
                 채팅
               </a>
-              <a href="#" className="text-gray-500 hover:text-primary-600 px-3 py-2 text-sm font-medium">
+              <Link
+                to="/profile"
+                className="text-gray-500 hover:text-primary-600 px-3 py-2 text-sm font-medium"
+              >
                 프로필
-              </a>
+              </Link>
             </nav>
           </div>
 

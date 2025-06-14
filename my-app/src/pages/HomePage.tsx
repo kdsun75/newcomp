@@ -1,60 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Filter, Plus } from 'lucide-react';
 import Button from '../components/ui/Button';
 import PostList from '../components/features/posts/PostList';
+import Modal from '../components/Modal';
+import CreatePost from '../components/CreatePost';
+import AdminDeleteButton from '../components/AdminDeleteButton';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import { Editor } from '@tinymce/tinymce-react';
 
 const HomePage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('latest');
   const [loading, setLoading] = useState(false);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [posts, setPosts] = useState<any[]>([]);
 
-  // 모의 데이터
-  const mockPosts = [
-    {
-      id: '1',
-      title: 'ChatGPT-4의 새로운 기능 소개',
-      content: 'OpenAI에서 발표한 ChatGPT-4의 혁신적인 기능들을 자세히 살펴보겠습니다. 특히 멀티모달 기능과 향상된 추론 능력에 대해 이야기해보겠습니다. 이번 업데이트로 인해 AI 업계에 어떤 변화가 일어날지 함께 분석해보겠습니다.',
-      author: {
-        name: '김개발자',
-        avatar: undefined,
-      },
-      createdAt: '2024-01-15T10:30:00Z',
-      likes: 24,
-      comments: 8,
-      tags: ['ChatGPT', '인공지능', '오픈AI'],
-      isLiked: false,
-      isBookmarked: true,
-    },
-    {
-      id: '2',
-      title: '머신러닝 모델 성능 최적화 팁',
-      content: '실제 프로덕션 환경에서 머신러닝 모델의 성능을 향상시키는 다양한 방법들을 소개합니다. 하이퍼파라미터 튜닝부터 데이터 전처리, 모델 앙상블까지 실무에서 바로 적용할 수 있는 팁들을 정리했습니다.',
-      author: {
-        name: '이데이터',
-        avatar: undefined,
-      },
-      createdAt: '2024-01-14T15:20:00Z',
-      likes: 18,
-      comments: 12,
-      tags: ['머신러닝', '최적화', '성능향상'],
-      isLiked: true,
-      isBookmarked: false,
-    },
-    {
-      id: '3',
-      title: 'Python으로 시작하는 딥러닝 기초',
-      content: '딥러닝을 처음 시작하는 분들을 위한 완벽 가이드입니다. Python과 TensorFlow를 사용하여 첫 번째 신경망을 구축하는 방법부터 실제 프로젝트까지 단계별로 설명드립니다.',
-      author: {
-        name: '박머신',
-        avatar: undefined,
-      },
-      createdAt: '2024-01-13T09:15:00Z',
-      likes: 32,
-      comments: 15,
-      tags: ['Python', '딥러닝', '초보자'],
-      isLiked: false,
-      isBookmarked: false,
-    },
-  ];
+  const fetchPosts = async () => {
+    const postsRef = collection(db, 'posts');
+    const snapshot = await getDocs(postsRef);
+    const postsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setPosts(postsList);
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   const filters = [
     { key: 'latest', label: '최신순', active: activeFilter === 'latest' },
@@ -69,8 +39,40 @@ const HomePage: React.FC = () => {
     setTimeout(() => setLoading(false), 1000);
   };
 
+  const handleOpenPostModal = () => setIsPostModalOpen(true);
+  const handleClosePostModal = async () => {
+    setIsPostModalOpen(false);
+    await fetchPosts(); // 모달 닫으면서 최신 글 목록도 불러오기
+  };
+
+  const TinyMCEEditor: React.FC = () => {
+    const handleEditorChange = (content: string) => {
+      console.log('Content:', content);
+    };
+
+    return (
+      <Editor
+        apiKey="your-api-key" // TinyMCE API 키 (무료 버전은 'no-api-key' 사용 가능)
+        init={{
+          height: 500,
+          menubar: false,
+          plugins: [
+            'advlist autolink lists link image charmap print preview anchor',
+            'searchreplace visualblocks code fullscreen',
+            'insertdatetime media table paste code help wordcount'
+          ],
+          toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                   alignleft aligncenter alignright alignjustify | \
+                   bullist numlist outdent indent | removeformat | help'
+        }}
+        onEditorChange={handleEditorChange}
+      />
+    );
+  };
+
   return (
     <div className="space-y-6">
+      <AdminDeleteButton />
       {/* 헤더 섹션 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -78,10 +80,13 @@ const HomePage: React.FC = () => {
           <p className="text-gray-600 mt-1">최신 AI 트렌드와 인사이트를 공유해보세요</p>
         </div>
         
-        <Button variant="primary" className="w-full sm:w-auto">
-          <Plus className="w-4 h-4 mr-2" />
+        <button
+          onClick={handleOpenPostModal}
+          className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors text-sm font-medium"
+        >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
           글 작성
-        </Button>
+        </button>
       </div>
 
       {/* 필터 및 정렬 */}
@@ -109,7 +114,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* 게시글 목록 */}
-      <PostList posts={mockPosts} loading={loading} />
+      <PostList posts={posts} loading={loading} />
 
       {/* 더 보기 버튼 */}
       <div className="text-center">
@@ -117,6 +122,10 @@ const HomePage: React.FC = () => {
           더 많은 게시글 보기
         </Button>
       </div>
+
+      <Modal isOpen={isPostModalOpen} onClose={handleClosePostModal}>
+        <CreatePost onPostCreated={handleClosePostModal} />
+      </Modal>
     </div>
   );
 };

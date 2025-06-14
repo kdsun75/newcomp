@@ -5,6 +5,12 @@ import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SurveyPage from './pages/SurveyPage';
+import PrivateRoute from './components/auth/PrivateRoute';
+import Header from './components/layout/Header';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import Profile from './pages/Profile';
 import './App.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -60,43 +66,59 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const AppContent: React.FC = () => {
   return (
     <Router>
-      <Routes>
-        {/* 공개 라우트 */}
-        <Route 
-          path="/login" 
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          } 
-        />
-        
-        {/* 보호된 라우트 */}
-        <Route 
-          path="/survey" 
-          element={
-            <ProtectedRoute>
-              <SurveyPage />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/" 
-          element={
-            <ProtectedRoute>
-              <SurveyGuard>
-                <Layout>
-                  <HomePage />
-                </Layout>
-              </SurveyGuard>
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* 기본 라우트 */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <AuthProvider>
+        <div className="min-h-screen bg-gray-100">
+          <Header />
+          <main className="container mx-auto px-4 py-8">
+            <Routes>
+              {/* 공개 라우트 */}
+              <Route 
+                path="/login" 
+                element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                } 
+              />
+              
+              {/* 보호된 라우트 */}
+              <Route 
+                path="/survey" 
+                element={
+                  <ProtectedRoute>
+                    <SurveyPage />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route 
+                path="/" 
+                element={
+                  <ProtectedRoute>
+                    <SurveyGuard>
+                      <Layout>
+                        <HomePage />
+                      </Layout>
+                    </SurveyGuard>
+                  </ProtectedRoute>
+                } 
+              />
+              
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
+              
+              {/* 기본 라우트 */}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </main>
+        </div>
+      </AuthProvider>
     </Router>
   );
 };

@@ -21,6 +21,7 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
+  const author = post.author || { name: '알 수 없음', avatar: undefined };
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -38,20 +39,20 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-primary-400 to-secondary-400 rounded-full flex items-center justify-center">
-              {post.author.avatar ? (
+              {author.avatar ? (
                 <img
-                  src={post.author.avatar}
-                  alt={post.author.name}
+                  src={author.avatar}
+                  alt={author.name}
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
                 <span className="text-white font-medium text-sm">
-                  {post.author.name.charAt(0)}
+                  {author.name.charAt(0)}
                 </span>
               )}
             </div>
             <div>
-              <h4 className="font-medium text-gray-900">{post.author.name}</h4>
+              <h4 className="font-medium text-gray-900">{author.name}</h4>
               <p className="text-sm text-gray-500">{formatDate(post.createdAt)}</p>
             </div>
           </div>
